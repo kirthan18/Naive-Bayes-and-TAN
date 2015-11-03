@@ -3,3 +3,5 @@ HW#3.iml
 *.javac
 *.name
 
+*.class
+out/production
