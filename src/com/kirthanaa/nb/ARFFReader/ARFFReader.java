@@ -1,5 +1,6 @@
 package com.kirthanaa.nb.ARFFReader;
 
+import com.kirthanaa.nb.Entities.NBAttributeClass;
 import com.kirthanaa.nb.Entities.NaiveBayesAttribute;
 import weka.core.Instances;
 import weka.core.converters.ArffLoader;
@@ -35,11 +36,11 @@ public class ARFFReader {
     /**
      * List of attributes in the parsed ARFF File
      */
-    private ArrayList<NaiveBayesAttribute> mNaiveBayesAttributeList = null;
+    public ArrayList<NaiveBayesAttribute> mNaiveBayesAttributeList = null;
 
-    private HashMap<String,Integer> mClassDistribution = null;
+    public HashMap<String,Integer> mClassDistribution = null;
 
-    private HashMap<String, HashMap<String, Integer>> mAttributeDistributionList = null;
+    public HashMap<String, ArrayList<NBAttributeClass>> mAttributeDistributionList = null;
 
     /**
      * Gets an instance of ARFFReader class
@@ -73,21 +74,23 @@ public class ARFFReader {
 
         if (mNaiveBayesAttributeList == null) {
             mNaiveBayesAttributeList = new ArrayList<NaiveBayesAttribute>();
-            mAttributeDistributionList = new HashMap<String, HashMap<String, Integer>>(data.numAttributes());
+            mAttributeDistributionList = new HashMap<String , ArrayList<NBAttributeClass>>(data.numAttributes());
         }
 
-        if (data.classIndex() == -1) {
+        if (data.classIndex() != -1) {
             for (int i = 0; i < data.numAttributes() - 1; i++) {
                 attributeOrdinal = i;
                 attributeName = data.attribute(i).name();
                 if (data.attribute(i).isNominal()) {
                     attributeValues = new String[data.attribute(i).numValues()];
-                    HashMap<String, Integer> attributeValueHash = new HashMap<String, Integer>();
+                    ArrayList<NBAttributeClass> attributeClassArrayList = new ArrayList<>(attributeValues.length);
+
                     for (int j = 0; j < data.attribute(i).numValues(); j++) {
                         attributeValues[j] = data.attribute(i).value(j);
-                        attributeValueHash.put(attributeValues[j], 0);
+                        NBAttributeClass nbAttributeClass = new NBAttributeClass(attributeValues[j], new int[]{0,0});
+                        attributeClassArrayList.add(nbAttributeClass);
                     }
-                    mAttributeDistributionList.put(attributeName, attributeValueHash);
+                    mAttributeDistributionList.put(attributeName, attributeClassArrayList);
                 }
                 NaiveBayesAttribute naiveBayesAttribute = new NaiveBayesAttribute(attributeOrdinal, attributeName,
                         attributeValues);
@@ -175,8 +178,28 @@ public class ARFFReader {
                 HashMap<String, String> attributeHash = new HashMap<>();
                 for (int j = 0; j < data.instance(i).numValues() - 1; j++) {
                     attributeHash.put(mNaiveBayesAttributeList.get(j).getAttributeName(), data.instance(i).stringValue(j));
-                    int count = mAttributeDistributionList.get(mNaiveBayesAttributeList.get(j).getAttributeName()).get(data.instance(i).stringValue(j));
-                    mAttributeDistributionList.get(mNaiveBayesAttributeList.get(j).getAttributeName()).put(data.instance(i).stringValue(j), count + 1);
+
+                    String attrName = mNaiveBayesAttributeList.get(j).getAttributeName();
+                    String attrValue = data.instance(i).stringValue(j);
+                    ArrayList<NBAttributeClass> attrList = mAttributeDistributionList.get(attrName);
+                    int index = -1;
+                    for(int k = 0; k < mAttributeDistributionList.get(mNaiveBayesAttributeList.get(j).getAttributeName()).size(); k++) {
+                        if (attrList.get(k).getAttributeValue().equalsIgnoreCase(attrValue)) {
+                            index = k;
+                            break;
+                        }
+                    }
+                    if(data.instance(i).stringValue(data.instance(i).numValues() - 1).equalsIgnoreCase(mClassLabels[0])){
+                        int c = mAttributeDistributionList.get(mNaiveBayesAttributeList.get(j).getAttributeName()).
+                                get(index).getAttributeClassCount()[0];
+                        c = c + 1;
+                        mAttributeDistributionList.get(attrName).get(index).setAttributeClassCount(0,c);
+                    }else if(data.instance(i).stringValue(data.instance(i).numValues() - 1).equalsIgnoreCase(mClassLabels[1])){
+                        int c = mAttributeDistributionList.get(mNaiveBayesAttributeList.get(j).getAttributeName()).
+                                get(index).getAttributeClassCount()[1];
+                        c = c + 1;
+                        mAttributeDistributionList.get(attrName).get(index).setAttributeClassCount(1,c);
+                    }
                 }
                 mClassLabelList.add(data.instance(i).stringValue(data.instance(i).numValues() - 1));
                 int classCount = mClassDistribution.get(data.instance(i).stringValue(data.instance(i).numValues() - 1));
@@ -234,9 +257,9 @@ public class ARFFReader {
                 arffLoader.setFile(filedata);
                 Instances data = arffLoader.getDataSet();
                 //System.out.println("Data instance set successfully! No instances : " + data.numInstances());
-                setNaiveBayesAttributes(data);
-
                 setNaiveBayesClass(data);
+
+                setNaiveBayesAttributes(data);
 
                 setDataInstanceList(data);
 
