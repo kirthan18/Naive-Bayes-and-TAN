@@ -1,14 +1,15 @@
-package com.kirthanaa.nb.NaiveBayes;
+package com.kirthanaa.nb.HW3;
 
 import com.kirthanaa.nb.ARFFReader.ARFFReader;
 import com.kirthanaa.nb.Entities.NBAttributeClass;
+import com.kirthanaa.nb.Entities.NaiveBayesAttribute;
 
 import java.util.ArrayList;
 
 /**
  * Created by kirthanaaraghuraman on 11/3/15.
  */
-public class NaiveBayes {
+public class NaiveBayesTAN {
 
     private static ARFFReader mTrainFile = null;
 
@@ -16,6 +17,9 @@ public class NaiveBayes {
 
 
     private static void predictClasses(){
+
+        int numCorrectlyClassified = 0;
+
         for(int i = 0; i < mTestFile.getNumberOfDataInstances(); i++){
             double attrProbability = 1;
             double initialClassProbability = (double)(mTrainFile.mClassDistribution.get(mTrainFile.mClassLabels[0]) + 1)/
@@ -63,15 +67,15 @@ public class NaiveBayes {
                                 .get(x).getAttributeClassCount()[j]);
                     }
                     laplaceDen = attrProb;
-                    double probAttrGivenClass = (double)laplaceNum/(double)laplaceDen;
+                    double probAttrGivenClass = laplaceNum/laplaceDen;
+                    attrClassProb = attrClassProb * probAttrGivenClass;
+
                     //double numClass = (double)mTrainFile.mClassDistribution.get(mTrainFile.mClassLabels[j]);
                     //double probAttrGivenClass = numAttrGivenClass/numClass;
-
                     /*System.out.println("NumAttrGivenClass = " + numAttrGivenClass);
                     System.out.println("Laplace num = " + laplaceNum);
                     System.out.println("Laplace den = " + laplaceDen);
                     System.out.println("Prob attr given class = " + probAttrGivenClass);*/
-                    attrClassProb = attrClassProb * probAttrGivenClass;
                     /*System.out.println("Attr class Prob = " + attrClassProb);
                     System.out.println("\n****************************************\n\n");*/
 
@@ -89,20 +93,44 @@ public class NaiveBayes {
             /*System.out.println("Numerator : " + numerator);
             System.out.println("Denominator : " + denominator);*/
             if(numerator/denominator > 0.5){
+                if(mTestFile.mClassLabels[0].equalsIgnoreCase(mTestFile.mClassLabelList.get(i))){
+                    numCorrectlyClassified++;
+                }
                 System.out.println(mTestFile.mClassLabels[0] + " " + mTestFile.mClassLabelList.get(i) + " " +
                         (numerator/denominator));
             }else{
+                if(mTestFile.mClassLabels[1].equalsIgnoreCase(mTestFile.mClassLabelList.get(i))){
+                    numCorrectlyClassified++;
+                }
                 System.out.println(mTestFile.mClassLabels[1] + " " + mTestFile.mClassLabelList.get(i) + " " +
                         (1.0 - (numerator/denominator)));
             }
-
         }
+
+        System.out.println("\n" + numCorrectlyClassified);
+    }
+
+
+    private static void printAttributes(){
+        for(NaiveBayesAttribute attribute : mTrainFile.getAttributeList()){
+            System.out.println(attribute.getAttributeName() + " class");
+        }
+        System.out.println();
+    }
+
+    private static void naiveBayesClassifier(){
+        printAttributes();
+        predictClasses();
+    }
+
+    private static void tanClassifier(){
+
     }
 
 
     public static void main(String[] args){
-        String trainFile = "/Users/kirthanaaraghuraman/Documents/CS760/HW#3/src/com/kirthanaa/nb/Files/lymph_train.arff";
-        String testFile = "/Users/kirthanaaraghuraman/Documents/CS760/HW#3/src/com/kirthanaa/nb/Files/lymph_test.arff";
+        String trainFile = "/Users/kirthanaaraghuraman/Documents/CS760/HW#3/src/com/kirthanaa/nb/Files/vote_train.arff";
+        String testFile = "/Users/kirthanaaraghuraman/Documents/CS760/HW#3/src/com/kirthanaa/nb/Files/vote_test.arff";
 
         mTrainFile = ARFFReader.getInstance(trainFile);
         mTrainFile.parseARFFFile();
@@ -110,6 +138,9 @@ public class NaiveBayes {
         mTestFile = ARFFReader.getInstance(testFile);
         mTestFile.parseARFFFile();
 
-        predictClasses();
+        naiveBayesClassifier();
+
+        tanClassifier();
+
     }
 }
