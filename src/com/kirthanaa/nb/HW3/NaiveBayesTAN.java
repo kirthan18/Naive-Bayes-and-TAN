@@ -126,6 +126,7 @@ public class NaiveBayesTAN {
     private static void tanClassifier(){
         TAN tanClassifier = new TAN(mTrainFile, mTestFile);
         tanClassifier.computeEdgeWeights();
+        tanClassifier.getMST();
     }
 
 

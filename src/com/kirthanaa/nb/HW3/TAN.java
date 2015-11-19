@@ -247,4 +247,20 @@ public class TAN {
             System.out.println();
         }
     }
+
+    private void printMSTAdjacenyMatrix(){
+        for(int i = 0; i <= mGraph.getVertices(); i++){
+            for(int j = 0; j <= mGraph.getVertices(); j++){
+                System.out.print(mGraph.getMSTAdjacencyMatrix()[i][j] + "\t");
+            }
+            System.out.println();
+        }
+    }
+
+    public void getMST(){
+        mGraph.getMaximalSpanningTree();
+        //printMSTAdjacenyMatrix();
+        mGraph.addNodeFromClass();
+        printMSTAdjacenyMatrix();
+    }
 }
