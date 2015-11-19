@@ -17,7 +17,7 @@ public class NBGraph {
         if(numVertex < 0){
             throw new IllegalArgumentException("Number of vertices cannot be less than 0.");
         }
-        this.mVertices = 0;
+        this.mVertices = numVertex;
         this.mEdges = (numVertex * (numVertex - 1))/2;
         addEdges();
     }
@@ -25,7 +25,7 @@ public class NBGraph {
     private void addEdges(){
         mAdjacencyMatrix = new double[mVertices][mVertices];
         for(int vertex = 0; vertex < mVertices; vertex++){
-            Arrays.fill(mAdjacencyMatrix[vertex], 1);
+            Arrays.fill(mAdjacencyMatrix[vertex], -1);
         }
     }
 
@@ -49,6 +49,9 @@ public class NBGraph {
         mAdjacencyMatrix[srcVertex][destVertex] = weight;
     }
 
+    public double[][] getAdjacencyMatrix(){
+        return this.mAdjacencyMatrix;
+    }
 
 
 }

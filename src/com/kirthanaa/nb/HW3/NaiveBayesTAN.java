@@ -124,13 +124,14 @@ public class NaiveBayesTAN {
     }
 
     private static void tanClassifier(){
-
+        TAN tanClassifier = new TAN(mTrainFile, mTestFile);
+        tanClassifier.computeEdgeWeights();
     }
 
 
     public static void main(String[] args){
-        String trainFile = "/Users/kirthanaaraghuraman/Documents/CS760/HW#3/src/com/kirthanaa/nb/Files/vote_train.arff";
-        String testFile = "/Users/kirthanaaraghuraman/Documents/CS760/HW#3/src/com/kirthanaa/nb/Files/vote_test.arff";
+        String trainFile = "/Users/kirthanaaraghuraman/Documents/CS760/HW#3/src/com/kirthanaa/nb/Files/lymph_train.arff";
+        String testFile = "/Users/kirthanaaraghuraman/Documents/CS760/HW#3/src/com/kirthanaa/nb/Files/lymph_test.arff";
 
         mTrainFile = ARFFReader.getInstance(trainFile);
         mTrainFile.parseARFFFile();
@@ -138,7 +139,7 @@ public class NaiveBayesTAN {
         mTestFile = ARFFReader.getInstance(testFile);
         mTestFile.parseARFFFile();
 
-        naiveBayesClassifier();
+        //naiveBayesClassifier();
 
         tanClassifier();
 
