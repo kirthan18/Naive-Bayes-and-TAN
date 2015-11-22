@@ -13,12 +13,27 @@ import java.util.HashMap;
  */
 public class TAN {
 
+    /**
+     * Attribute graph
+     */
     private NBGraph mGraph = null;
 
+    /**
+     * Train file instance
+     */
     private ARFFReader mTrainFile = null;
 
+    /**
+     * Test file instance
+     */
     private ARFFReader mTestFile = null;
 
+    /**
+     * Initializes TAN class variab;e
+     *
+     * @param trainFile Train file instance
+     * @param testFile  Test file instance
+     */
     public TAN(ARFFReader trainFile, ARFFReader testFile) {
         mGraph = new NBGraph(trainFile.getNumberOfAttributes());
         this.mTrainFile = trainFile;
@@ -39,28 +54,12 @@ public class TAN {
         return ans;
     }
 
-    private double findAttributeProbability(int attribute, String attrValue) {
-        int count = 0;
-
-        String attributeName = mTrainFile.getAttributeList().get(attribute).getAttributeName();
-
-        ArrayList<NBAttributeClass> nbAttributeClasses = mTrainFile.mAttributeDistributionList.get(attributeName);
-
-        for (int i = 0; i < nbAttributeClasses.size(); i++) {
-            if (nbAttributeClasses.get(i).getAttributeValue().equalsIgnoreCase(attrValue)) {
-                count = nbAttributeClasses.get(i).getAttributeClassCount()[0] +
-                        nbAttributeClasses.get(i).getAttributeClassCount()[1];
-                break;
-            }
-        }
-
-        double laplaceNumerator = (double) (count + 1);
-        double laplaceDenominator = (double) nbAttributeClasses.size() + (double) mTrainFile.getNumberOfDataInstances();
-        double probAfterLaplaceEstimate = laplaceNumerator / laplaceDenominator;
-
-        return probAfterLaplaceEstimate;
-    }
-
+    /**
+     * Calculates class probability
+     *
+     * @param classIndex Index of class label for which class probability is to be calculated
+     * @return Class probability
+     */
     private double findClassProbability(int classIndex) {
         int classCount = mTrainFile.mClassDistribution.get(mTestFile.mClassLabels[classIndex]);
 
@@ -71,6 +70,16 @@ public class TAN {
         return probAfterLaplaceEstimation;
     }
 
+    /**
+     * Calculates joint probability P(srcAttr = srcAttrValue, destAttr = destAttrValue, class = classlabel)
+     *
+     * @param srcAttribute       Index of source attribute
+     * @param destAttribute      Index of destination attribute
+     * @param srcAttributeValue  Value of source attribute
+     * @param destAttributeValue Value of destination attribute
+     * @param classLabel         Index of class label for which probability is to be calculated
+     * @return Calculated Joint Probability
+     */
     private double findJointProbability(int srcAttribute, int destAttribute, String srcAttributeValue,
                                         String destAttributeValue, String classLabel) {
         double jointProbability = 0.0;
@@ -91,11 +100,6 @@ public class TAN {
                 count++;
             }
         }
-        /*double pxi = findAttributeProbability(srcAttribute, srcAttributeValue);
-        double pxj = findAttributeProbability(destAttribute, destAttributeValue);
-        double py = findClassProbability(classLabel);
-
-        jointProbability = pxi * pxj * py;*/
 
         double laplaceNumerator = (double) (count + 1);
 
@@ -109,6 +113,16 @@ public class TAN {
         return jointProbability;
     }
 
+    /**
+     * Calculates conditional probability P(srcAttr = srcAttrValue, destAttr = destAttrValue | class = classlabel)
+     *
+     * @param srcAttr         Index of source attribute
+     * @param srcAttrValue    Value of source attribute
+     * @param destAttr        Index of destination attribute
+     * @param destAttrValue   Value of destination attribute
+     * @param classLabelIndex Index of class label for which probability is to be calculated
+     * @return Estimated probability
+     */
     private double getConditionalProbability(int srcAttr, String srcAttrValue,
                                              int destAttr, String destAttrValue,
                                              int classLabelIndex) {
@@ -141,6 +155,14 @@ public class TAN {
         return conditionalProbability;
     }
 
+    /**
+     * Calculates conditional probability P(attr = attrValue | class = classlabel)
+     *
+     * @param attr            Attribute index
+     * @param attrValue       Value of attribute
+     * @param classLabelIndex Index of class label for which probability is to be calculated
+     * @return Calculated probability
+     */
     private double getConditionalProbability(int attr, String attrValue, int classLabelIndex) {
         int count = 0;
         String classLabel = mTrainFile.mClassLabels[classLabelIndex];
@@ -165,6 +187,13 @@ public class TAN {
     }
 
 
+    /**
+     * Calculates weight of edge between source and destination attribute
+     *
+     * @param srcAttribute  Source attribute
+     * @param destAttribute Destination attribute
+     * @return Weight of edge between source and destination attribute
+     */
     private double calculateWeight(int srcAttribute, int destAttribute) {
 
         //Initialize sum = 0.0
@@ -214,6 +243,9 @@ public class TAN {
     }
 
 
+    /**
+     * Computes edge weights using mutual information gain for the attribute graph
+     */
     public void computeEdgeWeights() {
         for (int i = 0; i < mTrainFile.getNumberOfAttributes(); i++) {
             for (int j = 0; j < mTrainFile.getNumberOfAttributes(); j++) {
@@ -242,6 +274,9 @@ public class TAN {
         //printAdjacencyMatrix();
     }
 
+    /**
+     * Prints adjacency matrix of the attribute graph
+     */
     private void printAdjacencyMatrix() {
         for (int i = 0; i < mGraph.getVertices(); i++) {
             for (int j = 0; j < mGraph.getVertices(); j++) {
@@ -251,6 +286,9 @@ public class TAN {
         }
     }
 
+    /**
+     * Prints MST adjancency matrix
+     */
     private void printMSTAdjacenyMatrix() {
         for (int i = 0; i <= mGraph.getVertices(); i++) {
             for (int j = 0; j <= mGraph.getVertices(); j++) {
@@ -260,6 +298,9 @@ public class TAN {
         }
     }
 
+    /**
+     * Constructs maximal spanning tree from the attribute graph
+     */
     public void getMST() {
         mGraph.getMaximalSpanningTree();
         //printMSTAdjacenyMatrix();
@@ -267,6 +308,9 @@ public class TAN {
         //printMSTAdjacenyMatrix();
     }
 
+    /**
+     * Prints parent attributes for each attribute
+     */
     public void printParentAtrributes() {
         for (int j = 0; j < mTrainFile.getNumberOfAttributes(); j++) {
             ArrayList<Integer> parentAttributeList = mGraph.getParentAttribute(j);
@@ -309,43 +353,15 @@ public class TAN {
         return parentAttributeList;
     }
 
-    private double findAllAttributeJointProbability(int dataInstanceIndex) {
-        HashMap<String, String> dataInstance = mTestFile.getDataInstanceList().get(dataInstanceIndex);
-        double sum = 0;
-
-        int count = 0;
-        for (int i = 0; i < mTrainFile.getNumberOfDataInstances(); i++) {
-            boolean isAllAttributeMatch = true;
-
-            for (int j = 0; j < mTrainFile.getNumberOfAttributes(); j++) {
-                String attributeName = mTestFile.getAttributeList().get(j).getAttributeName();
-                String attributeValue = dataInstance.get(attributeName);
-
-                if (attributeValue == mTrainFile.getDataInstanceList().get(i).get(attributeName)) {
-                    continue;
-                } else {
-                    isAllAttributeMatch = false;
-                    break;
-                }
-            }
-            if (isAllAttributeMatch) {
-                count++;
-            }
-        }
-        double laplaceNumerator = (double) (count + 1);
-
-        int laplaceCount = 1;
-
-        for (int l = 0; l < mTrainFile.getNumberOfAttributes(); l++) {
-            laplaceCount = laplaceCount * mTrainFile.getAttributeList().get(l).getAttributeValues().length;
-        }
-
-        double laplaceDenominator = (double) laplaceCount + (double) mTrainFile.getNumberOfDataInstances();
-
-        double pX1XnY = laplaceNumerator / laplaceDenominator;
-        return pX1XnY;
-    }
-
+    /**
+     * Calculates conditional probability given an attribute and parent attribute list
+     *
+     * @param dataInstanceIndex   Instance index for which probability is to be calculated
+     * @param attributeIndex      Index of attribute
+     * @param parentAttributeList List of parent attributes for the given attribute
+     * @param classIndex          Index of class for which probability is to be estimated
+     * @return Computed Probability
+     */
     private double findJointProbability(int dataInstanceIndex, int attributeIndex, ArrayList<Integer> parentAttributeList,
                                         int classIndex) {
         HashMap<String, String> dataInstance = mTestFile.getDataInstanceList().get(dataInstanceIndex);
@@ -435,6 +451,9 @@ public class TAN {
     }
 
 
+    /**
+     * Makes predictions for test instances and prints output with number of instances correctly classified
+     */
     public void classify() {
         int numCorrectlyClassified = 0;
 

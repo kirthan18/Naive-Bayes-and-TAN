@@ -38,8 +38,14 @@ public class ARFFReader {
      */
     public ArrayList<NaiveBayesAttribute> mNaiveBayesAttributeList = null;
 
+    /**
+     * Hash Map of that contains the details of distribution of class instances
+     */
     public HashMap<String, Integer> mClassDistribution = null;
 
+    /**
+     * Hash map containing details of counts of each attribute values for each class labels
+     */
     public HashMap<String, ArrayList<NBAttributeClass>> mAttributeDistributionList = null;
 
     /**

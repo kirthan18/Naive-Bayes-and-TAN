@@ -11,11 +11,19 @@ import java.util.ArrayList;
  */
 public class NaiveBayesTAN {
 
+    /**
+     * Training File instance
+     */
     private static ARFFReader mTrainFile = null;
 
+    /**
+     * Test file instance
+     */
     private static ARFFReader mTestFile = null;
 
-
+    /**
+     * Predics class labels using Naive Bayes method
+     */
     private static void predictClasses() {
 
         int numCorrectlyClassified = 0;
@@ -85,9 +93,7 @@ public class NaiveBayesTAN {
                     numerator = initialClassProbability * attrProbability;
                 }
 
-                //System.out.println("%%%%%% " + (classProbability * attrClassProb) + " %%%%%%");
                 denominator = denominator + (classProbability * attrClassProb);
-                //System.out.println("\n****************************************\n\n");
             }
 
             /*System.out.println("Numerator : " + numerator);
@@ -110,7 +116,9 @@ public class NaiveBayesTAN {
         System.out.println("\n" + numCorrectlyClassified);
     }
 
-
+    /**
+     * Prints attributes according to specifications for Naive Bayes method
+     */
     private static void printAttributes() {
         for (NaiveBayesAttribute attribute : mTrainFile.getAttributeList()) {
             System.out.println(attribute.getAttributeName() + " class");
@@ -118,11 +126,21 @@ public class NaiveBayesTAN {
         System.out.println();
     }
 
+    /**
+     * Makes predictions using Naive Bayes classifier and prints output in
+     * required format
+     */
     private static void naiveBayesClassifier() {
         printAttributes();
         predictClasses();
     }
 
+    /**
+     * Constructs a graph of all attributes, computes edge weights using mutual information
+     * Constructs a maximal spanning tree
+     * Makes predictions using the constructed MST
+     * Prints output in required format
+     */
     private static void tanClassifier() {
         TAN tanClassifier = new TAN(mTrainFile, mTestFile);
         tanClassifier.computeEdgeWeights();
