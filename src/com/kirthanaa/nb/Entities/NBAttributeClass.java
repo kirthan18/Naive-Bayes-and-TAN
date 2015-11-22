@@ -9,7 +9,7 @@ public class NBAttributeClass {
 
     private int[] mAttributeClassCount;
 
-    public NBAttributeClass(String attributeValue, int[] attributeClassCount){
+    public NBAttributeClass(String attributeValue, int[] attributeClassCount) {
         this.mAttributeValue = attributeValue;
         this.mAttributeClassCount = new int[2];
         this.mAttributeClassCount = attributeClassCount;
@@ -23,7 +23,7 @@ public class NBAttributeClass {
         return mAttributeValue;
     }
 
-    public void setAttributeClassCount(int index, int count){
+    public void setAttributeClassCount(int index, int count) {
         this.mAttributeClassCount[index] = count;
     }
 }

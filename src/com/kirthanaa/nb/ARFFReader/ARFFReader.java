@@ -38,7 +38,7 @@ public class ARFFReader {
      */
     public ArrayList<NaiveBayesAttribute> mNaiveBayesAttributeList = null;
 
-    public HashMap<String,Integer> mClassDistribution = null;
+    public HashMap<String, Integer> mClassDistribution = null;
 
     public HashMap<String, ArrayList<NBAttributeClass>> mAttributeDistributionList = null;
 
@@ -74,7 +74,7 @@ public class ARFFReader {
 
         if (mNaiveBayesAttributeList == null) {
             mNaiveBayesAttributeList = new ArrayList<NaiveBayesAttribute>();
-            mAttributeDistributionList = new HashMap<String , ArrayList<NBAttributeClass>>(data.numAttributes());
+            mAttributeDistributionList = new HashMap<String, ArrayList<NBAttributeClass>>(data.numAttributes());
         }
 
         if (data.classIndex() != -1) {
@@ -87,7 +87,7 @@ public class ARFFReader {
 
                     for (int j = 0; j < data.attribute(i).numValues(); j++) {
                         attributeValues[j] = data.attribute(i).value(j);
-                        NBAttributeClass nbAttributeClass = new NBAttributeClass(attributeValues[j], new int[]{0,0});
+                        NBAttributeClass nbAttributeClass = new NBAttributeClass(attributeValues[j], new int[]{0, 0});
                         attributeClassArrayList.add(nbAttributeClass);
                     }
                     mAttributeDistributionList.put(attributeName, attributeClassArrayList);
@@ -129,8 +129,8 @@ public class ARFFReader {
             }
         }
         mClassDistribution = new HashMap<>(mClassLabels.length);
-        for(int i = 0; i < mClassLabels.length; i++){
-            mClassDistribution.put(mClassLabels[i],0);
+        for (int i = 0; i < mClassLabels.length; i++) {
+            mClassDistribution.put(mClassLabels[i], 0);
         }
     }
 
@@ -183,22 +183,22 @@ public class ARFFReader {
                     String attrValue = data.instance(i).stringValue(j);
                     ArrayList<NBAttributeClass> attrList = mAttributeDistributionList.get(attrName);
                     int index = -1;
-                    for(int k = 0; k < mAttributeDistributionList.get(mNaiveBayesAttributeList.get(j).getAttributeName()).size(); k++) {
+                    for (int k = 0; k < mAttributeDistributionList.get(mNaiveBayesAttributeList.get(j).getAttributeName()).size(); k++) {
                         if (attrList.get(k).getAttributeValue().equalsIgnoreCase(attrValue)) {
                             index = k;
                             break;
                         }
                     }
-                    if(data.instance(i).stringValue(data.instance(i).numValues() - 1).equalsIgnoreCase(mClassLabels[0])){
+                    if (data.instance(i).stringValue(data.instance(i).numValues() - 1).equalsIgnoreCase(mClassLabels[0])) {
                         int c = mAttributeDistributionList.get(mNaiveBayesAttributeList.get(j).getAttributeName()).
                                 get(index).getAttributeClassCount()[0];
                         c = c + 1;
-                        mAttributeDistributionList.get(attrName).get(index).setAttributeClassCount(0,c);
-                    }else if(data.instance(i).stringValue(data.instance(i).numValues() - 1).equalsIgnoreCase(mClassLabels[1])){
+                        mAttributeDistributionList.get(attrName).get(index).setAttributeClassCount(0, c);
+                    } else if (data.instance(i).stringValue(data.instance(i).numValues() - 1).equalsIgnoreCase(mClassLabels[1])) {
                         int c = mAttributeDistributionList.get(mNaiveBayesAttributeList.get(j).getAttributeName()).
                                 get(index).getAttributeClassCount()[1];
                         c = c + 1;
-                        mAttributeDistributionList.get(attrName).get(index).setAttributeClassCount(1,c);
+                        mAttributeDistributionList.get(attrName).get(index).setAttributeClassCount(1, c);
                     }
                 }
                 mClassLabelList.add(data.instance(i).stringValue(data.instance(i).numValues() - 1));

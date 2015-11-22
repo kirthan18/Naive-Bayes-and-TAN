@@ -16,36 +16,36 @@ public class NaiveBayesTAN {
     private static ARFFReader mTestFile = null;
 
 
-    private static void predictClasses(){
+    private static void predictClasses() {
 
         int numCorrectlyClassified = 0;
 
-        for(int i = 0; i < mTestFile.getNumberOfDataInstances(); i++){
+        for (int i = 0; i < mTestFile.getNumberOfDataInstances(); i++) {
             double attrProbability = 1;
-            double initialClassProbability = (double)(mTrainFile.mClassDistribution.get(mTrainFile.mClassLabels[0]) + 1)/
-                    (double)(mTrainFile.getNumberOfDataInstances() + mTrainFile.mClassLabels.length);
+            double initialClassProbability = (double) (mTrainFile.mClassDistribution.get(mTrainFile.mClassLabels[0]) + 1) /
+                    (double) (mTrainFile.getNumberOfDataInstances() + mTrainFile.mClassLabels.length);
             double classProbability = 1;
             double attrClassProb = 1;
             double denominator = 0.0;
             double numerator = 0.0;
 
-            for(int j = 0; j < mTrainFile.mClassLabels.length; j++){
+            for (int j = 0; j < mTrainFile.mClassLabels.length; j++) {
 
                /* System.out.println("\n****************************************");
                 System.out.println("Class label : " + mTrainFile.mClassLabels[j]);*/
-                classProbability = (double)(mTrainFile.mClassDistribution.get(mTrainFile.mClassLabels[j]) + 1)/
-                        (double)(mTrainFile.getNumberOfDataInstances() + mTrainFile.mClassLabels.length);
+                classProbability = (double) (mTrainFile.mClassDistribution.get(mTrainFile.mClassLabels[j]) + 1) /
+                        (double) (mTrainFile.getNumberOfDataInstances() + mTrainFile.mClassLabels.length);
                 //System.out.println("Class " + j + " probability : " + classProbability);
 
                 attrClassProb = 1;
 
-                for(int k = 0; k < mTrainFile.getNumberOfAttributes(); k++){
+                for (int k = 0; k < mTrainFile.getNumberOfAttributes(); k++) {
                     String attrName = mTestFile.getAttributeList().get(k).getAttributeName();
                     String attrValue = mTestFile.getDataInstanceList().get(i).get(attrName);
                     int index = -1;
                     ArrayList<NBAttributeClass> nbAttributeClasses = mTrainFile.mAttributeDistributionList.get(attrName);
-                    for(int l = 0; l < nbAttributeClasses.size(); l++){
-                        if(nbAttributeClasses.get(l).getAttributeValue().equalsIgnoreCase(attrValue)){
+                    for (int l = 0; l < nbAttributeClasses.size(); l++) {
+                        if (nbAttributeClasses.get(l).getAttributeValue().equalsIgnoreCase(attrValue)) {
                             index = l;
                             break;
                         }
@@ -57,17 +57,17 @@ public class NaiveBayesTAN {
                             .get(index).getAttributeClassCount()[j]/(double)
                             (mTrainFile.mAttributeDistributionList.get(attrName).get(index).getAttributeClassCount()[0] +
                                     mTrainFile.mAttributeDistributionList.get(attrName).get(index).getAttributeClassCount()[1]));*/
-                    double numAttrGivenClass = ((double)mTrainFile.mAttributeDistributionList.get(attrName)
+                    double numAttrGivenClass = ((double) mTrainFile.mAttributeDistributionList.get(attrName)
                             .get(index).getAttributeClassCount()[j]);
                     double laplaceNum = numAttrGivenClass + 1;
                     double laplaceDen = 0.0;
                     double attrProb = mTrainFile.mAttributeDistributionList.get(attrName).size();
-                    for(int x = 0; x < mTrainFile.mAttributeDistributionList.get(attrName).size(); x++){
-                        attrProb = attrProb + ((double)mTrainFile.mAttributeDistributionList.get(attrName)
+                    for (int x = 0; x < mTrainFile.mAttributeDistributionList.get(attrName).size(); x++) {
+                        attrProb = attrProb + ((double) mTrainFile.mAttributeDistributionList.get(attrName)
                                 .get(x).getAttributeClassCount()[j]);
                     }
                     laplaceDen = attrProb;
-                    double probAttrGivenClass = laplaceNum/laplaceDen;
+                    double probAttrGivenClass = laplaceNum / laplaceDen;
                     attrClassProb = attrClassProb * probAttrGivenClass;
 
                     //double numClass = (double)mTrainFile.mClassDistribution.get(mTrainFile.mClassLabels[j]);
@@ -80,7 +80,7 @@ public class NaiveBayesTAN {
                     System.out.println("\n****************************************\n\n");*/
 
                 }
-                if(j == 0){
+                if (j == 0) {
                     attrProbability = attrClassProb;
                     numerator = initialClassProbability * attrProbability;
                 }
@@ -92,18 +92,18 @@ public class NaiveBayesTAN {
 
             /*System.out.println("Numerator : " + numerator);
             System.out.println("Denominator : " + denominator);*/
-            if(numerator/denominator > 0.5){
-                if(mTestFile.mClassLabels[0].equalsIgnoreCase(mTestFile.mClassLabelList.get(i))){
+            if (numerator / denominator > 0.5) {
+                if (mTestFile.mClassLabels[0].equalsIgnoreCase(mTestFile.mClassLabelList.get(i))) {
                     numCorrectlyClassified++;
                 }
                 System.out.println(mTestFile.mClassLabels[0] + " " + mTestFile.mClassLabelList.get(i) + " " +
-                        (numerator/denominator));
-            }else{
-                if(mTestFile.mClassLabels[1].equalsIgnoreCase(mTestFile.mClassLabelList.get(i))){
+                        (numerator / denominator));
+            } else {
+                if (mTestFile.mClassLabels[1].equalsIgnoreCase(mTestFile.mClassLabelList.get(i))) {
                     numCorrectlyClassified++;
                 }
                 System.out.println(mTestFile.mClassLabels[1] + " " + mTestFile.mClassLabelList.get(i) + " " +
-                        (1.0 - (numerator/denominator)));
+                        (1.0 - (numerator / denominator)));
             }
         }
 
@@ -111,28 +111,35 @@ public class NaiveBayesTAN {
     }
 
 
-    private static void printAttributes(){
-        for(NaiveBayesAttribute attribute : mTrainFile.getAttributeList()){
+    private static void printAttributes() {
+        for (NaiveBayesAttribute attribute : mTrainFile.getAttributeList()) {
             System.out.println(attribute.getAttributeName() + " class");
         }
         System.out.println();
     }
 
-    private static void naiveBayesClassifier(){
+    private static void naiveBayesClassifier() {
         printAttributes();
         predictClasses();
     }
 
-    private static void tanClassifier(){
+    private static void tanClassifier() {
         TAN tanClassifier = new TAN(mTrainFile, mTestFile);
         tanClassifier.computeEdgeWeights();
         tanClassifier.getMST();
+        tanClassifier.printParentAtrributes();
+        tanClassifier.classify();
     }
 
 
-    public static void main(String[] args){
-        String trainFile = "/Users/kirthanaaraghuraman/Documents/CS760/HW#3/src/com/kirthanaa/nb/Files/lymph_train.arff";
-        String testFile = "/Users/kirthanaaraghuraman/Documents/CS760/HW#3/src/com/kirthanaa/nb/Files/lymph_test.arff";
+    public static void main(String[] args) {
+        //String trainFile = "/Users/kirthanaaraghuraman/Documents/CS760/HW#3/src/com/kirthanaa/nb/Files/vote_train.arff";
+        //String testFile = "/Users/kirthanaaraghuraman/Documents/CS760/HW#3/src/com/kirthanaa/nb/Files/vote_test.arff";
+
+        String trainFile = args[0];
+        String testFile = args[1];
+
+        char algo = args[2].charAt(0);
 
         mTrainFile = ARFFReader.getInstance(trainFile);
         mTrainFile.parseARFFFile();
@@ -140,9 +147,14 @@ public class NaiveBayesTAN {
         mTestFile = ARFFReader.getInstance(testFile);
         mTestFile.parseARFFFile();
 
-        //naiveBayesClassifier();
+        switch (algo) {
+            case 'n':
+                naiveBayesClassifier();
+                break;
 
-        tanClassifier();
-
+            case 't':
+                tanClassifier();
+                break;
+        }
     }
 }
