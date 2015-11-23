@@ -166,7 +166,7 @@ public class NaiveBayesTAN {
         mTestFile.parseARFFFile();
 
         switch (algo) {
-            case 'n':
+            case 'b':
                 naiveBayesClassifier();
                 break;
 
